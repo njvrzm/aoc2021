@@ -20,24 +20,18 @@ func GetInput(path string) Input {
 }
 
 func PartOne(input Input) int {
-	last := input[0]
-	ups := 0
-	for _, val := range input {
-		if val > last {
-			ups += 1
-		}
-		last = val
-	}
-	return ups
+	return CountUpwardSpans(input, 1)
 }
 
 func PartTwo(input Input) int {
+	return CountUpwardSpans(input, 3)
+}
+
+func CountUpwardSpans(input Input, span int) int {
 	ups := 0
-	for i := range input {
-		if i > 2 {
-			if input[i] > input[i-3] {
-				ups += 1
-			}
+	for i := span; i < len(input); i++ {
+		if input[i] > input[i-span] {
+			 ups += 1
 		}
 	}
 	return ups
