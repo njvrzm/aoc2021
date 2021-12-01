@@ -2,6 +2,9 @@
 
 What is there to say? Nothing, really.
 
+![build & test](https://github.com/njvrzm/aoc2021/actions/workflows/go.yml/badge.svg)
+
+
 # License stuff
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
