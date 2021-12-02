@@ -6,51 +6,61 @@ import (
 	"strings"
 )
 
-type Input []string
+type Direction string
 
-func GetInput(path string) Input {
-	return help.ReadInput(path)
+type Command struct {
+	Direction string
+	Distance int
+}
+
+type Input []Command
+
+func GetInput(path string) []Command {
+	lines := help.ReadInput(path)
+	out := make([]Command, len(lines))
+	for _, line := range lines {
+		parts := strings.SplitN(line, " ", 2)
+		distance, err := strconv.Atoi(parts[1])
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, Command{parts[0], distance})
+	}
+	return out
 }
 
 func PartOne(input Input) int {
-	depth, farth := 0, 0
-	for _, line := range input {
-		parts := strings.Split(line, " ")
-		direction := parts[0]
-		distance, err := strconv.Atoi(parts[1])
-		if err != nil {
-			panic(err)
-		}
-		switch direction {
-		case "forward":
-			farth += distance
-		case "down":
-			depth += distance
-		case "up":
-			depth -= distance
-		}
-	}
-	return depth * farth
+	return solve(input, false)
 }
 
 func PartTwo(input Input) int {
+	return solve(input, true)
+}
+
+func solve(input Input, partTwo bool) int {
 	depth, farth, aim := 0, 0, 0
-	for _, line := range input {
-		parts := strings.Split(line, " ")
-		direction := parts[0]
-		distance, err := strconv.Atoi(parts[1])
-		if err != nil {
-			panic(err)
-		}
-		switch direction {
+	for _, command := range input {
+		fFactor, dFactor, aFactor := 0, 0, 0
+		switch command.Direction {
 		case "forward":
-			farth += distance
-			depth += aim * distance
+			fFactor = 1
+			dFactor = aim
 		case "down":
-			aim += distance
+			if partTwo {
+				aFactor = 1
+			} else {
+				dFactor = 1
+			}
 		case "up":
-			aim -= distance
+			if partTwo {
+				aFactor = -1
+			} else {
+				dFactor = -1
+			}
 		}
+		farth += fFactor * command.Distance
+		depth += dFactor * command.Distance
+		aim += aFactor * command.Distance
 	}
 	return depth * farth
 }

@@ -11,7 +11,14 @@ func TestDayTwoPartOne(t *testing.T) {
 		Expected int
 	}{
 		{
-			Input{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"},
+			Input{
+				Command{"forward", 5},
+				Command{"down",  5},
+				Command{"forward",  8},
+				Command{"up",  3},
+				Command{"down",  8},
+				Command{"forward",  2},
+			},
 			150,
 		},
 		{
@@ -31,7 +38,14 @@ func TestDayTwoPartTwo(t *testing.T) {
 		Expected int
 	}{
 		{
-			Input{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"},
+			Input{
+				Command{"forward", 5},
+				Command{"down",  5},
+				Command{"forward",  8},
+				Command{"up",  3},
+				Command{"down",  8},
+				Command{"forward",  2},
+			},
 			900,
 		},
 		{
