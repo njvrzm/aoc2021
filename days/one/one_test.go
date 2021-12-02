@@ -20,7 +20,7 @@ func TestPartOne(t *testing.T) {
 		},
 	}
 	for _, testCase := range tt {
-		assert.Equal(t, PartOne(testCase.Input), testCase.Expected)
+		assert.Equal(t, testCase.Expected, PartOne(testCase.Input))
 	}
 }
 
@@ -40,7 +40,7 @@ func TestPartTwo(t *testing.T) {
 		},
 	}
 	for _, testCase := range tt {
-		assert.Equal(t, PartTwo(testCase.Input), testCase.Expected)
+		assert.Equal(t, testCase.Expected, PartTwo(testCase.Input))
 	}
 }
 
