@@ -10,94 +10,81 @@ func GetInput(path string) []string {
 }
 
 func PartOne(input []string) int {
-	gamma, epsilon := 0, 0
-	length := len(input)
-	bit := 1 << (len(input[0]) - 1)
-	for i := range input[0] {
-		ones := 0
-		for _, str := range input {
-			if str[i:i+1] == "1" {
-				ones += 1
-			}
-		}
-		if ones > length / 2 {
-			gamma += bit
-		} else {
-			epsilon += bit
-		}
-		bit /= 2
+	size := len(input[0])
+	gamma, epsilon := make([]byte, size), make([]byte, size)
+
+	for i := 0; i < size; i++ {
+		gamma[i] = commonestBitAt(input, i)
+		epsilon[i] = rarestBitAt(input, i)
 	}
-	return gamma * epsilon
+	return bitsToInt(string(gamma)) * bitsToInt(string(epsilon))
 }
 
 func PartTwo(input []string) int {
-	oxy := make([]string, len(input))
-	copy(oxy, input)
-	for i := range oxy[0] {
-		if len(oxy) == 1 {
+	oxygen := whittle(input, commonestBitAt)
+	carbox := whittle(input, rarestBitAt)
+	return bitsToInt(oxygen) * bitsToInt(carbox)
+}
+
+func drop(ss []string, dd []bool) []string {
+	out := []string{}
+	for i, s  := range ss {
+		if !dd[i] {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func whittle(input []string, whittler func([]string, int) uint8) string {
+	size := len(input[0])
+	discarded := make([]bool, len(input))
+	for i := 0; i < size; i++ {
+		kept := drop(input, discarded)
+		if len(kept) == 1 {
 			break
 		}
-		ones, zeros := 0, 0
-		for _, str := range oxy {
-			if str[i] == '1' {
-				ones += 1
-			} else {
-				zeros += 1
+		match := whittler(kept, i)
+		for j, s := range input {
+			if s[i] != match {
+				discarded[j] = true
 			}
 		}
-		var newoxy []string
-		if ones >= zeros {
-			newoxy = []string{}
-			for _, str := range oxy {
-				if str[i] == '1' {
-					newoxy = append(newoxy, str)
-				}
-			}
-		} else {
-			newoxy = []string{}
-			for _, str := range oxy {
-				if str[i] == '0' {
-					newoxy = append(newoxy, str)
-				}
-			}
-		}
-		oxy = newoxy
 	}
-	co2 := make([]string, len(input))
-	copy(co2, input)
-	for i := range co2[0] {
-		if len(co2) == 1 {
-			break
+	return drop(input, discarded)[0]
+}
+
+func commonestBitAt(ss []string, place int) uint8 {
+	return extremeBitAtPlace(ss, place, func(o int, z int) uint8 {
+		if o >= z {
+			return '1'
 		}
-		ones, zeros := 0, 0
-		for _, str := range co2 {
-			if str[i] == '1' {
-				ones += 1
-			} else {
-				zeros += 1
-			}
+		return '0'
+	})
+}
+
+func rarestBitAt(ss []string, place int) uint8 {
+	return extremeBitAtPlace(ss, place, func(o int, z int) uint8 {
+		if z <= o {
+			return '0'
 		}
-		newco2 := []string{}
-		if zeros <= ones {
-			newco2 = []string{}
-			for _, str := range co2 {
-				if str[i] == '0' {
-					newco2 = append(newco2, str)
-				}
-			}
+		return '1'
+	})
+}
+
+func extremeBitAtPlace(ss []string, place int, chooser func(int, int) uint8) uint8 {
+	ones, zeroes := 0, 0
+	for _, s := range ss {
+		if s[place] == '1' {
+			ones += 1
 		} else {
-			newco2 = []string{}
-			for _, str := range co2 {
-				if str[i] == '1' {
-					newco2 = append(newco2, str)
-				}
-			}
+			zeroes += 1
 		}
-		co2 = newco2
 	}
+	return chooser(ones, zeroes)
+}
 
-	o, _ := strconv.ParseInt(oxy[0], 2, 16)
-	c, _ := strconv.ParseInt(co2[0], 2, 16)
-	return int(o * c)
-
+func bitsToInt(bits string) int {
+	i, _ := strconv.ParseInt(bits, 2, 64)
+	return int(i)
 }
