@@ -2,7 +2,6 @@ package two
 
 import (
 	"aoc/help"
-	"strconv"
 	"strings"
 )
 
@@ -20,11 +19,7 @@ func GetInput(path string) []Command {
 	out := make([]Command, len(lines))
 	for _, line := range lines {
 		parts := strings.SplitN(line, " ", 2)
-		distance, err := strconv.Atoi(parts[1])
-		if err != nil {
-			panic(err)
-		}
-		out = append(out, Command{parts[0], distance})
+		out = append(out, Command{parts[0], help.Sinter(parts[1])})
 	}
 	return out
 }

@@ -3,7 +3,6 @@ package four
 import (
 	"aoc/help"
 	"fmt"
-	"strconv"
 	"strings"
 	"unicode"
 )
@@ -28,15 +27,13 @@ func GetInput(path string) Game {
 		lines[i] = strings.TrimSpace(lines[i])
 	}
 	for _, s := range strings.Split(lines[0], ",") {
-		n, _ := strconv.Atoi(s)
-		b.Calls = append(b.Calls, n)
+		b.Calls = append(b.Calls, help.Sinter(s))
 	}
 	for i := 2; i<len(lines); i += 6 {
 		board := Board{}
 		for j := 0; j < 5; j++ {
 			for k, s := range strings.FieldsFunc(lines[i+j], unicode.IsSpace) {
-				n, _ := strconv.Atoi(s)
-				board.Values[j][k] = n
+				board.Values[j][k] = help.Sinter(s)
 			}
 		}
 		b.Boards = append(b.Boards, &board)

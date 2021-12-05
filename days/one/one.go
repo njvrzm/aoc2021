@@ -2,7 +2,6 @@ package one
 
 import (
 	"aoc/help"
-	"strconv"
 )
 
 type Input []int
@@ -10,11 +9,7 @@ type Input []int
 func GetInput(path string) Input {
 	out := Input{}
 	for _, line := range help.ReadInput(path) {
-		i, err := strconv.Atoi(line)
-		if err != nil {
-			panic(err)
-		}
-		out = append(out, i)
+		out = append(out, help.Sinter(line))
 	}
 	return out
 }

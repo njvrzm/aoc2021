@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -17,4 +18,9 @@ func ReadInput(path string) []string {
 	}
 	return lines
 
+}
+
+func Sinter(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
 }
