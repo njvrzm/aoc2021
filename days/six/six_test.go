@@ -2,7 +2,6 @@ package six
 
 import (
 	"aoc/help"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -31,7 +30,6 @@ func TestDaySixPartTwo_Example(t *testing.T) {
 	input := "3,4,3,1,2"
 	school := School{}
 	school.FromString(input)
-	fmt.Println(school)
 	for i := 0; i < 256; i ++ {
 		school.Tick()
 	}
@@ -41,7 +39,6 @@ func TestDaySixPartTwo_Input(t *testing.T) {
 	input := help.ReadInput("../../inputs/six")[0]
 	school := School{}
 	school.FromString(input)
-	fmt.Println(school)
 	for i := 0; i < 256; i ++ {
 		school.Tick()
 	}
