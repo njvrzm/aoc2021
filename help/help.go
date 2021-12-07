@@ -24,3 +24,29 @@ func Sinter(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i
 }
+
+func Min(ns []int) int {
+	t := ns[0]
+	for _, v := range ns[1:] {
+		if v < t {
+			t = v
+		}
+	}
+	return t
+}
+func Max(ns []int) int {
+	t := ns[0]
+	for _, v := range ns[1:] {
+		if v > t {
+			t = v
+		}
+	}
+	return t
+}
+
+func Abs(i int) int {
+	if i < 0 {
+		return -i
+	}
+	return i
+}
