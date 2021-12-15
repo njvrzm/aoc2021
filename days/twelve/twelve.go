@@ -42,39 +42,28 @@ func (m *Map) Connect(oneName, twoName string) {
 
 type Path []Cave
 
-func (p Path) Occurences(name string) int {
-	occ := 0
-	for _, n := range p {
-		if n.Name == name {
-			occ += 1
-		}
-	}
-	return occ
-}
-
-func (m *Map) CountEgresses(path Path, canRepeat bool) int {
-	tail := path[len(path)-1]
-	if tail.Name == "end" {
+func (m Map) CountEgresses(source Cave, canRepeat bool, beenTo map[string]int) int {
+	if source.Name == "end" {
 		return 1
 	}
 	egresses := 0
-	for name := range tail.Exits {
+	if strings.ToLower(source.Name) == source.Name {
+		beenTo[source.Name] += 1
+	}
+	for name := range source.Exits {
 		if name == "start" {
 			continue
 		}
-		didRepeat := false
-		if strings.ToLower(name) == name {
-			occ := path.Occurences(name)
-			if occ == 1 {
-				if !canRepeat {
-					continue
-				}
-				didRepeat = true
-			} else if occ > 1 {
-				continue
+		if beenTo[name] > 0 {
+			if canRepeat {
+				egresses += m.CountEgresses(m.GetCave(name), false, beenTo)
 			}
+		} else {
+			egresses += m.CountEgresses(m.GetCave(name), canRepeat, beenTo)
 		}
-		egresses += m.CountEgresses(append(path, m.GetCave(name)), canRepeat && !didRepeat)
+	}
+	if strings.ToLower(source.Name) == source.Name {
+		beenTo[source.Name] -= 1
 	}
 	return egresses
 }

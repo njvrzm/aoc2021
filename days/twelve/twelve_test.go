@@ -17,8 +17,8 @@ func TestDayTwelvePartOne(t *testing.T) {
 	}
 	for _, tt := range testCases {
 		caves := GetInput(tt.path)
-		path := []Cave{caves.GetCave("start")}
-		assert.Equal(t, tt.expected, caves.CountEgresses(path, false))
+		count := caves.CountEgresses(caves.GetCave("start"), false, make(map[string]int))
+		assert.Equal(t, tt.expected, count)
 	}
 }
 func TestDayTwelvePartTwo(t *testing.T) {
@@ -33,7 +33,7 @@ func TestDayTwelvePartTwo(t *testing.T) {
 	}
 	for _, tt := range testCases {
 		caves := GetInput(tt.path)
-		path := []Cave{caves.GetCave("start")}
-		assert.Equal(t, tt.expected, caves.CountEgresses(path, true))
+		count := caves.CountEgresses(caves.GetCave("start"), true, make(map[string]int))
+		assert.Equal(t, tt.expected, count)
 	}
 }
