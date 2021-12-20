@@ -10,7 +10,9 @@ import (
 
 func ReadInput(path string) []string {
 	fh, err := os.Open(path)
-	if err != nil {panic(err)}
+	if err != nil {
+		panic(err)
+	}
 	lines := []string{}
 	sc := bufio.NewScanner(io.Reader(fh))
 	for sc.Scan() {
@@ -25,7 +27,15 @@ func Sinter(s string) int {
 	return i
 }
 
-func Min(ns []int) int {
+func Sinters(ss []string) []int {
+	ints := []int{}
+	for _, s := range ss {
+		ints = append(ints, Sinter(s))
+	}
+	return ints
+}
+
+func Min(ns ...int) int {
 	t := ns[0]
 	for _, v := range ns[1:] {
 		if v < t {
@@ -34,7 +44,7 @@ func Min(ns []int) int {
 	}
 	return t
 }
-func Max(ns []int) int {
+func Max(ns ...int) int {
 	t := ns[0]
 	for _, v := range ns[1:] {
 		if v > t {
@@ -42,6 +52,31 @@ func Max(ns []int) int {
 		}
 	}
 	return t
+}
+
+func PosiMod(n int, modulus int) int {
+	m := n % modulus
+	if m < 0 {
+		m += modulus
+	}
+	return m
+}
+
+func MinMax(ns []int) (int, int) {
+	if len(ns) == 0 {
+		return 0, 0
+	}
+	min := ns[0]
+	max := ns[0]
+	for _, n := range ns[1:] {
+		if n < min {
+			min = n
+		}
+		if n > max {
+			max = n
+		}
+	}
+	return min, max
 }
 
 func Abs(i int) int {
