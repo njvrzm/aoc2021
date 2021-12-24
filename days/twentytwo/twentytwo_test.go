@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestDayTwentyTwo(t *testing.T) {
+func TestDayTwentyTwo_Partial(t *testing.T) {
 	testCases := []struct {
-		cubes       Cubes
+		cubes       Cuboids
 		expected_on int
 	}{
 		{
@@ -24,7 +24,26 @@ func TestDayTwentyTwo(t *testing.T) {
 		},
 	}
 	for _, tt := range testCases {
-		assert.Equal(t, tt.expected_on, tt.cubes.EvaluateSlow())
+		assert.Equal(t, tt.expected_on, tt.cubes.Union(true))
+	}
+
+}
+func TestDayTwentyTwo_Full(t *testing.T) {
+	testCases := []struct {
+		cubes       Cuboids
+		expected_on int
+	}{
+		{
+			GetInput("testdata/example_three"),
+			2758514936282235,
+		},
+		{
+			GetInput("../../inputs/twentytwo"),
+			1294137045134837,
+		},
+	}
+	for _, tt := range testCases {
+		assert.Equal(t, tt.expected_on, tt.cubes.Union(false))
 	}
 
 }

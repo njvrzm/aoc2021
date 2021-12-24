@@ -2,6 +2,7 @@ package twentytwo
 
 import (
 	"aoc/help"
+	"sort"
 	"strings"
 )
 
@@ -10,12 +11,74 @@ type Span struct {
 	High int
 }
 
-func (sp *Span) Local() bool {
-	return sp.Low >= -50 && sp.High <= 50
+func (sp *Span) Size() int {
+	return sp.High + 1 - sp.Low
 }
 
-func (sp *Span) Width() int {
-	return sp.High + 1 - sp.Low
+func (sp *Span) Overlaps(osp Span) bool {
+	return (sp.High >= osp.Low) && (osp.High >= sp.Low)
+}
+
+func (sp *Span) Intersection(osp Span) Span {
+	points := []int{sp.Low, sp.High, osp.Low, osp.High}
+	sort.Ints(points)
+	return Span{points[1], points[2]}
+}
+
+type Cuboid struct {
+	X  Span
+	Y  Span
+	Z  Span
+	On bool
+}
+
+func (c *Cuboid) Volume() int {
+	return c.X.Size() * c.Y.Size() * c.Z.Size()
+}
+
+func (c *Cuboid) Overlaps(o Cuboid) bool {
+	return c.X.Overlaps(o.X) && c.Y.Overlaps(o.Y) && c.Z.Overlaps(o.Z)
+}
+
+func (c *Cuboid) Intersection(o Cuboid) Cuboid {
+	return Cuboid{
+		c.X.Intersection(o.X),
+		c.Y.Intersection(o.Y),
+		c.Z.Intersection(o.Z),
+		true, // a bit hacky but necessary
+	}
+}
+
+type Cuboids []Cuboid
+
+// Union counts the total number of cells left on by the given sequence.
+// The idea is this: go through the sequence backwards. This way we only
+// need to consider each cuboid once in its role of contributing to the
+// total. "off" cuboids contribute nothing; to count the contribution of
+// an "on" cuboid:
+// * Find its intersection with each later cuboid
+// * Find the total volume of those intersections (hey! it's recursion!)
+// * Subtract that from the cuboid's volume
+func (c Cuboids) Union(localOnly bool) int {
+	totalOn := 0
+	top := len(c) - 1
+	for i := top; i >= 0; i-- {
+		cuboid := c[i]
+		if localOnly && !cuboid.Local() {
+			continue
+		}
+		if cuboid.On {
+			intersections := Cuboids{}
+			for j := i + 1; j <= top; j++ {
+				if cuboid.Overlaps(c[j]) {
+					intersections = append(intersections, cuboid.Intersection(c[j]))
+				}
+			}
+			subtract := intersections.Union(localOnly)
+			totalOn += cuboid.Volume() - subtract
+		}
+	}
+	return totalOn
 }
 
 func (sp *Span) FromString(s string) {
@@ -24,41 +87,8 @@ func (sp *Span) FromString(s string) {
 	sp.High = help.Sinter(lh[1])
 }
 
-type Cube struct {
-	X     Span
-	Y     Span
-	Z     Span
-	On    bool
-	Where Locus
-	index int
-}
-
-func (c *Cube) Local() bool {
-	return c.X.Local() && c.Y.Local() && c.Z.Local()
-}
-
-func (c *Cube) Init() {
-	c.index = -1
-	c.Next()
-}
-
-func (c *Cube) Volume() int {
-	return c.X.Width() * c.Y.Width() * c.Z.Width()
-}
-
-func (c *Cube) Done() bool {
-	return c.index == c.Volume()
-}
-
-func (c *Cube) Next() {
-	c.index += 1
-	c.Where.X = c.X.Low + c.index/c.Y.Width()/c.Z.Width()
-	c.Where.Y = c.Y.Low + (c.index/c.Z.Width())%c.Y.Width()
-	c.Where.Z = c.Z.Low + c.index%c.Z.Width()
-}
-
-func CubeFromString(s string) Cube {
-	c := Cube{}
+func CuboidFromString(s string) Cuboid {
+	c := Cuboid{}
 	parts := strings.SplitN(s, " ", 2)
 	c.On = parts[0] == "on"
 	xyz := strings.SplitN(parts[1], ",", 3)
@@ -68,35 +98,20 @@ func CubeFromString(s string) Cube {
 	return c
 }
 
-type Cubes []Cube
-
-type Locus struct {
-	X int
-	Y int
-	Z int
-}
-
-func (c Cubes) EvaluateSlow() int {
-	on := map[Locus]bool{}
-	for _, cube := range c {
-		if !cube.Local() {
-			continue
-		}
-		for cube.Init(); !cube.Done(); cube.Next() {
-			if cube.On {
-				on[cube.Where] = true
-			} else {
-				delete(on, cube.Where)
-			}
-		}
-	}
-	return len(on)
-}
-
-func GetInput(path string) Cubes {
-	cubes := Cubes{}
+func GetInput(path string) Cuboids {
+	cuboids := Cuboids{}
 	for _, line := range help.ReadInput(path) {
-		cubes = append(cubes, CubeFromString(line))
+		cuboids = append(cuboids, CuboidFromString(line))
 	}
-	return cubes
+	return cuboids
+}
+
+// The following functions only apply to part one
+
+func (sp *Span) Local() bool {
+	return sp.Low >= -50 && sp.High <= 50
+}
+
+func (c *Cuboid) Local() bool {
+	return c.X.Local() && c.Y.Local() && c.Z.Local()
 }
